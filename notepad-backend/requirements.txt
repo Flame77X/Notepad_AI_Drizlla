@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+sqlalchemy
+requests
+python-multipart
+supabase
+python-jose
+pydantic
