@@ -1,67 +1,83 @@
-# 🌿 Sage Protocol (Formerly Notepad AI)
+# Properties Dashboard
 
-**A secure, AI-powered productivity dashboard built for the modern era.**
-
-> **Status**: Active Development  
-> **Version**: 1.0.0 (Sage Protocol Upgrade)
+**A productivity application that combines personal notes, event scheduling, and an Agentic AI Assistant.**
 
 ---
 
-## 🚀 Overview
+## 1. Project Overview
 
-**Sage Protocol** is more than just a notepad. It's an intelligent workspace that combines secure note-taking with an Agentic AI assistant capable of performing real actions.
+**Properties Dashboard** is a productivity application designed to streamline your workflow. It features an **Agentic AI Assistant** capable of context-aware interactions and executing actions on your behalf.
 
-Built with a **Security-First** mindset, the application ensures all credentials are managed via environment variables and offers a robust User Registration system powered by Supabase.
-
-### ✨ Key Features
-
-*   **🤖 Agentic AI Assistant**:
-    *   **Chat with Llama 3.2**: integrated via Pollinations.ai / Hugging Face.
-    *   **AI Actions**: The AI can **Create Notes** and **Schedule Events** for you.
-        *   *"Remind me to buy milk tomorrow at 10 AM"* -> **Creates Event**
-        *   *"Save a note about the meeting"* -> **Creates Note**
-    *   **Natural Language Processing**: Uses `dateparser` to understand complex time commands.
-
-*   **🔒 Enterprise-Grade Security**:
-    *   **No Hardcoded Secrets**: All API keys and credentials are strictly managed via `.env` files.
-    *   **Supabase Authentication**: Secure Sign Up & Login flow with email verification.
-    *   **Row Level Security (RLS)**: Users can only see their own data.
-
-*   **🎨 "Sage" UI Design**:
-    *   Custom CSS system (`SageStyles`) for a focused, brutalist-inspired aesthetic.
-    *   Responsive Dashboard with Note filtering and Calendar views.
+### Core Philosophy
+*   **Context Awareness**: The AI reads your notes and calendar to provide relevant answers.
+*   **Agency**: The AI can act on your behalf, such as creating notes or scheduling events via natural language commands.
+*   **Security**: Enterprise-grade data isolation using **Supabase Row Level Security (RLS)**.
 
 ---
 
-## 🛠️ Tech Stack
+## 2. Technology Stack
 
-### **Frontend**
-*   **React (Vite)**: Fast, modern UI framework.
-*   **Lucide React**: Beautiful, consistent iconography.
-*   **Supabase-JS**: Client-side authentication and database subscription.
+| Component | Choice | Why we used it |
+| :--- | :--- | :--- |
+| **Frontend** | **React (Vite)** | Fast development server and industry-standard component model. |
+| **Backend** | **FastAPI (Python)** | High performance, easy integration with AI libraries. |
+| **Database** | **Supabase (PostgreSQL)** | Handles authentication and data storage with Row Level Security. |
+| **AI Engine** | **Pollinations.ai** | **Cost-Effective Solution**. We use this free API to power the chat assistant, avoiding the credit limits/costs of OpenAI or Hugging Face. |
+| **Time Parsing** | **dateparser** | Python library used to convert natural language time (e.g., "tomorrow at 5") into database timestamps. |
 
-### **Backend**
-*   **FastAPI (Python)**: High-performance backend API.
-*   **Uvicorn**: ASGI server.
-*   **Dateparser**: For parsing natural language dates/times.
-*   **Pollinations.ai / Hugging Face**: LLM Inference Providers.
+---
 
-### **Database & Auth**
-*   **Supabase (PostgreSQL)**: Scalable relational database with built-in Auth and RLS.
+## 3. Directory Structure & Key Files
+
+### 🟢 Backend (`notepad-backend/`)
+*   **`main.py` (The Brain)**
+    *   **AI Integration**: Uses `requests.get()` to call Pollinations.ai.
+    *   **Agent Logic**: Contains a custom parser that intercepts AI responses starting with `[ACTION:NOTE|...]` or `[ACTION:EVENT|...]` to execute database inserts automatically.
+    *   **Endpoints**: `/chat`, `/notes`, `/events`.
+*   **`auth.py` (Security)**
+    *   Validates Supabase JWTs (JSON Web Tokens) to ensure requests are authorized.
+*   **`.env` (Secrets)**
+    *   Stores `SUPABASE_URL` and `SUPABASE_KEY` securely.
+
+### 🔵 Frontend (`notepad-frontend/src/`)
+*   **`App.jsx` (The Interface)**
+    *   **State**: Manages notes, events, and session (Auth).
+    *   **UI Features**:
+        *   **Login/Signup Toggle**: Users can register or log in.
+        *   **Dashboard**: Displays notes in a grid.
+        *   **Status Updates**: Dropdown to mark notes as Pending, In Progress, or Done.
+        *   **AI Chat**: A chat interface that sends user queries + context to the FastAPI backend.
+*   **`.env.local`**
+    *   Stores `VITE_SUPABASE_URL` and `VITE_SUPABASE_KEY`.
+
+---
+
+## 4. Development Challenges & Solutions
+
+### 🔴 Error: "AI Endpoint Not Available (410 Gone)"
+*   **Problem**: The Hugging Face free API we initially tried (Phi-3.5) was deprecated or rate-limited.
+*   **Solution**: Switched to **Pollinations.ai**, which provides stable, free text generation via GET requests.
+
+### 🔴 Error: "AI Can't Schedule Events"
+*   **Problem**: The AI didn't know how to convert relative dates like "next Friday" into a specific timestamp.
+*   **Solution**: Integrated **`dateparser`** in the backend to parse relative time strings into ISO format.
+
+### 🔴 Security Vulnerability
+*   **Problem**: API keys were initially hardcoded in the source files.
+*   **Solution**: Moved all keys to `.env` files and performed a codebase audit to ensure no secrets remained.
+
+---
+
+## 5. Security & Deployment
+
+*   **Row Level Security (RLS)**: Enabled on Supabase. Users can strictly only see rows matching their own `user_id`.
+*   **Environment Variables**: All API keys are git-ignored and not present in the repository.
 
 ---
 
 ## ⚙️ Setup Instructions
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/Flame77X/Notepad_AI_Drizlla.git
-cd Notepad_AI_Drizlla
-```
-
-### 2. Backend Setup
-Navigate to the `notepad-backend` directory and set up the Python environment.
-
+### 1. Backend Setup
 ```bash
 cd notepad-backend
 python -m venv venv
@@ -71,60 +87,12 @@ python -m venv venv
 source venv/bin/activate
 
 pip install -r requirements.txt
-```
-
-**Configuration (.env)**  
-Create a `.env` file in `notepad-backend/` with:
-```env
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_anon_key
-# Optional: Hugging Face Token if using HF Inference directly
-HF_TOKEN=your_hf_token
-```
-
-**Run Server**:
-```bash
 uvicorn main:app --reload
 ```
 
-### 3. Frontend Setup
-Navigate to the `notepad-frontend` directory.
-
+### 2. Frontend Setup
 ```bash
-cd ../notepad-frontend
+cd notepad-frontend
 npm install
-```
-
-**Configuration (.env.local)**  
-Create a `.env.local` file in `notepad-frontend/` with:
-```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-**Run Client**:
-```bash
 npm run dev
 ```
-
----
-
-## 🖼️ Usage
-
-1.  **Register/Login**: Create an account via the Sign-Up toggle.
-2.  **Dashboard**: View your notes and upcoming events.
-3.  **Chat**: Open the AI Assistant sidebar.
-    *   Try: *"Create a note: Project Ideas - Use React and Python"*
-    *   Try: *"Schedule a meeting for next Friday at 2pm"*
-
----
-
-## 🛡️ Security Audit
-
-*   **Secret Scanning**: Repository has been audited for leaked keys.
-*   **Git History**: Clean history with no sensitive data.
-*   **Access Control**: Backend verifies JWT tokens on every protected endpoint.
-
----
-
-**Developed by Flame77X**
