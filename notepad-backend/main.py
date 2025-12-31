@@ -342,6 +342,7 @@ def chat(
 
         # 5️⃣ EXTRACT RESPONSE AND CHECK FOR ACTIONS
         reply_text = response.text.strip()
+
         
         # --- ACTION HANDLER ---
         if reply_text.startswith("[ACTION:"):

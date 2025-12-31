@@ -15,7 +15,19 @@
 
 ---
 
-## 2. Technology Stack & Workflows
+## 2. Technology Stack
+
+| Component | Choice | Why we used it |
+| :--- | :--- | :--- |
+| **Frontend** | **React (Vite)** | Fast development server and industry-standard component model. |
+| **Backend** | **FastAPI (Python)** | High performance, easy integration with AI libraries. |
+| **Database** | **Supabase (PostgreSQL)** | Handles authentication and data storage with Row Level Security. |
+| **AI Engine** | **Pollinations.ai** | **Cost-Effective Solution**. We use this free API to power the chat assistant, avoiding the credit limits/costs of OpenAI or Hugging Face. |
+| **Time Parsing** | **dateparser** | Python library used to convert natural language time (e.g., "tomorrow at 5") into database timestamps. |
+
+---
+
+## 3. System Workflows
 
 Here is how each component works within the system:
 
@@ -58,7 +70,7 @@ Here is how each component works within the system:
 
 ---
 
-## 3. Directory Structure & Key Files
+## 4. Directory Structure & Key Files
 
 ### 🟢 Backend (`notepad-backend/`)
 *   **`main.py` (The Brain)**: Handles endpoints(`/chat`, `/notes`), AI calls, and Action Parsing.
@@ -71,7 +83,7 @@ Here is how each component works within the system:
 
 ---
 
-## 4. Development Challenges & Solutions
+## 5. Development Challenges & Solutions
 
 ### 🔴 Error: "AI Endpoint Not Available (410 Gone)"
 *   **Problem**: Hugging Face free API was deprecating generic inference endpoints.
@@ -87,14 +99,14 @@ Here is how each component works within the system:
 
 ---
 
-## 5. Security & Deployment
+## 6. Security & Deployment
 
 *   **Row Level Security (RLS)**: Enabled on Supabase. Users can strictly only see rows matching their own `user_id`.
 *   **Environment Variables**: All API keys are git-ignored and not present in the repository.
 
 ---
 
-## 🤖 6. AI Command Guide
+## 🤖 7. AI Command Guide
 
 The AI Assistant is designed to be an **active agent**. Here is how to control it:
 
@@ -113,7 +125,7 @@ The AI Assistant is designed to be an **active agent**. Here is how to control i
 
 ---
 
-## ⚙️ 7. Setup & Deployment Guide
+## ⚙️ 8. Setup & Deployment Guide
 
 ### Option A: Running Locally (For Development)
 
